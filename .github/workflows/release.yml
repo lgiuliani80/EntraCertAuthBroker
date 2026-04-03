@@ -7,8 +7,8 @@ on:
   workflow_dispatch:
     inputs:
       tag_name:
-        description: "Release tag to create, for example v1.0.0"
-        required: true
+        description: "Release tag to create, for example v1.0.0 (leave empty to skip release creation)"
+        required: false
         type: string
 
 permissions:
@@ -35,12 +35,18 @@ jobs:
         id: meta
         shell: bash
         run: |
+          CREATE_RELEASE="true"
+
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             TAG_NAME="${{ github.event.inputs.tag_name }}"
+            if [ -z "$TAG_NAME" ]; then
+              CREATE_RELEASE="false"
+            fi
           else
             TAG_NAME="${GITHUB_REF_NAME}"
           fi
 
+          echo "create_release=$CREATE_RELEASE" >> "$GITHUB_OUTPUT"
           echo "tag_name=$TAG_NAME" >> "$GITHUB_OUTPUT"
           echo "zip_name=EntraCertAuthBroker-$TAG_NAME.zip" >> "$GITHUB_OUTPUT"
 
@@ -67,6 +73,7 @@ jobs:
           if-no-files-found: error
 
       - name: Create GitHub Release
+        if: steps.meta.outputs.create_release == 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.meta.outputs.tag_name }}
