@@ -67,37 +67,19 @@ $certificatePassword = "<PFX_PASSWORD>"
 ```powershell
 az group create --name $resourceGroup --location $location
 
-az storage account create \
-  --name $storageAccount \
-  --resource-group $resourceGroup \
-  --location $location \
-  --sku Standard_LRS \
-  --allow-blob-public-access false
+az storage account create --name $storageAccount --resource-group $resourceGroup --location $location --sku Standard_LRS --allow-blob-public-access false
 ```
 
 ### 4. Create the Function App on Flex Consumption
 
 ```powershell
-az functionapp create \
-  --name $functionApp \
-  --resource-group $resourceGroup \
-  --storage-account $storageAccount \
-  --flexconsumption-location $location \
-  --runtime dotnet-isolated \
-  --runtime-version 10 \
-  --functions-version 4
+az functionapp create --name $functionApp --resource-group $resourceGroup --storage-account $storageAccount --flexconsumption-location $location --runtime dotnet-isolated --runtime-version 10 --functions-version 4
 ```
 
 ### 5. Upload the certificate and capture its thumbprint
 
 ```powershell
-$thumbprint = az webapp config ssl upload \
-  --resource-group $resourceGroup \
-  --name $functionApp \
-  --certificate-file $certificatePath \
-  --certificate-password $certificatePassword \
-  --query thumbprint \
-  -o tsv
+$thumbprint = az webapp config ssl upload --resource-group $resourceGroup --name $functionApp --certificate-file $certificatePath --certificate-password $certificatePassword --query thumbprint -o tsv
 ```
 
 ### 6. Configure the required app settings
@@ -118,12 +100,7 @@ az functionapp deployment source config-zip -g $resourceGroup -n $functionApp --
 ### 8. Get the function key and test the endpoint
 
 ```powershell
-$functionKey = az functionapp function keys list \
-  --resource-group $resourceGroup \
-  --name $functionApp \
-  --function-name token \
-  --query default \
-  -o tsv
+$functionKey = az functionapp function keys list --resource-group $resourceGroup --name $functionApp --function-name token --query default -o tsv
 
 Invoke-RestMethod -Method Get -Uri "https://$functionApp.azurewebsites.net/api/token?code=$functionKey"
 ```
