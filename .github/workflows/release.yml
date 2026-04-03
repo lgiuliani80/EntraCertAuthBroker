@@ -68,8 +68,8 @@ jobs:
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ steps.meta.outputs.zip_name }}
-          path: ${{ steps.meta.outputs.zip_name }}
+          name: EntraCertAuthBroker
+          path: ${{ env.PUBLISH_DIR }}
           if-no-files-found: error
 
       - name: Create GitHub Release
