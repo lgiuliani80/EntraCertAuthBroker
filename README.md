@@ -103,27 +103,16 @@ $thumbprint = az webapp config ssl upload \
 ### 6. Configure the required app settings
 
 ```powershell
-az functionapp config appsettings set \
-  --name $functionApp \
-  --resource-group $resourceGroup \
-  --settings \
-    CLIENT_ID=$clientId \
-    TENANT_ID=$tenantId \
-    TARGET_SCOPE=$targetScope \
-    WEBSITE_LOAD_CERTIFICATES=$thumbprint
+az functionapp config appsettings set --name $functionApp --resource-group $resourceGroup --settings CLIENT_ID=$clientId TENANT_ID=$tenantId TARGET_SCOPE=$targetScope WEBSITE_LOAD_CERTIFICATES=$thumbprint
 ```
 
 ### 7. Publish and deploy the function code
 
 ```powershell
-dotnet publish .\EntraCertAuthBroker.csproj -c Release -o .\publish
-Compress-Archive -Path .\publish\* -DestinationPath .\publish.zip -Force
+dotnet publish EntraCertAuthBroker.csproj -c Release -o publish
+Compress-Archive -Path publish\* -DestinationPath publish.zip -Force
 
-az functionapp deploy \
-  --resource-group $resourceGroup \
-  --name $functionApp \
-  --src-path .\publish.zip \
-  --type zip
+az functionapp deployment source config-zip -g $resourceGroup -n $functionApp --src publish.zip
 ```
 
 ### 8. Get the function key and test the endpoint
