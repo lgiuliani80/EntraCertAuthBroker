@@ -8,6 +8,8 @@ When invoked, the function uses the Microsoft Entra **client credentials** flow 
 { "token": "jwt-token" }
 ```
 
+> **IMPORTANT**: this function must always be deployed with Easy Auth enabled (Settings -> Authentication).
+
 ## Required configuration
 
 Set the following application settings in Azure or in `local.settings.json` for local development:
